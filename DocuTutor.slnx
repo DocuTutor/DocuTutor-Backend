@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="DocuTutor.Application/DocuTutor.Application.csproj" />
+  <Project Path="DocuTutor.Domain/DocuTutor.Domain.csproj" />
+  <Project Path="DocuTutor.Infrastructure/DocuTutor.Infrastructure.csproj" />
+  <Project Path="DocuTutor/DocuTutor.csproj" />
+</Solution>

@@ -1,0 +1,6 @@
+@DocuTutor_HostAddress = http://localhost:5008
+
+GET {{DocuTutor_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
