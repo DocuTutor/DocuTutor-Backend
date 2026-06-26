@@ -2,6 +2,7 @@ using DocuTutor.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using System.ComponentModel;
 using System.Text.Json;
 
 namespace DocuTutor.Infrastructure.Data.Context
@@ -15,9 +16,17 @@ namespace DocuTutor.Infrastructure.Data.Context
         public DbSet<Document> Documents { get; set; } = null!;
         public DbSet<DocumentChunk> DocumentChunks { get; set; } = null!;
 
+        //Adding them when we implement the conversation and message features to avoid conflict
+        //public DbSet<Conversation> Conversations => Set<Conversation>();
+        //public DbSet<Message> Messages => Set<Message>();
+        //public DbSet<MessageCitation> MessageCitations => Set<MessageCitation>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            //apply when working in feature 
+            //modelBuilder.ApplyConfigurationsFromAssembly(typeof(DocuTutorDbContext).Assembly);
 
             // Value converter for float[] to vector type
             var embeddingConverter = new ValueConverter<float[]?, string?>(
