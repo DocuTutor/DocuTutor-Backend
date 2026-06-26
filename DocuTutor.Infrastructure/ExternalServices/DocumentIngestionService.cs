@@ -59,7 +59,8 @@ namespace DocuTutor.Infrastructure.ExternalServices
                     output_type = "text",
                     tweaks = new Dictionary<string, object>
                     {
-                        ["TextInput-nIOtJ"] = new { input_value = extractedText }
+                        ["TextInput-nIOtJ"] = new { input_value = extractedText },
+                        ["CustomComponent-viZPZ"] = new { document_id = documentId.ToString() }
                     }
                 };
 
