@@ -41,3 +41,4 @@ namespace DocuTutor.Infrastructure.Configurations
             builder.HasIndex(x => x.CreatedAt);
         }
     }
+}

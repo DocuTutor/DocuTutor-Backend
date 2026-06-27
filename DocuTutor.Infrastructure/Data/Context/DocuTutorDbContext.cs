@@ -1,4 +1,5 @@
 using DocuTutor.Domain.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -7,7 +8,7 @@ using System.Text.Json;
 
 namespace DocuTutor.Infrastructure.Data.Context
 {
-    public class DocuTutorDbContext : DbContext
+    public class DocuTutorDbContext : IdentityDbContext<ApplicationUser>
     {
         public DocuTutorDbContext(DbContextOptions<DocuTutorDbContext> options) : base(options)
         {
