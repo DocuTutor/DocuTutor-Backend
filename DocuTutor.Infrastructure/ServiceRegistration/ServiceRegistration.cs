@@ -41,6 +41,13 @@ namespace DocuTutor.Infrastructure.ServiceRegistration
                     provider.GetRequiredService<IServiceScopeFactory>(),
                     provider.GetRequiredService<ILogger<DocumentIngestionService>>()
                 ));
+
+            services.AddHttpClient("LangflowRetrieval", client =>
+            {
+                client.Timeout = TimeSpan.FromMinutes(3);
+            });
+            services.AddScoped<IRetrievalService, LangflowRetrievalService>();
+
             return services;
         }
     }
