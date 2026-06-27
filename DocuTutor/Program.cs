@@ -12,7 +12,7 @@ namespace DocuTutor
 
             // Add services to the container.
             builder.Services.AddControllers();
-            //builder.Services.AddOpenApi();
+            builder.Services.AddOpenApi();
             builder.Services.AddSwaggerGen();
 
             builder.Services.AddHttpClient();
@@ -23,7 +23,7 @@ namespace DocuTutor
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                //app.MapOpenApi();
+                app.MapOpenApi();
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
