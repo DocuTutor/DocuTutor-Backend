@@ -34,4 +34,8 @@
     <ProjectReference Include="..\DocuTutor.Application\DocuTutor.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\AuthService\" />
+  </ItemGroup>
+
 </Project>
