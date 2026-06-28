@@ -1,7 +1,8 @@
 
-using DocuTutor.Controllers;
+using DocuTutor.Application.DTOs.Auth.Register;
 using DocuTutor.Infrastructure.ServiceRegistration;
-
+using DocuTutor.Validarors.Auth;
+using FluentValidation;
 namespace DocuTutor
 {
     public class Program
@@ -17,6 +18,11 @@ namespace DocuTutor
 
             builder.Services.AddHttpClient();
             builder.Services.AddInfrastructureServices(builder.Configuration);
+
+            //Temp registration of validators
+            builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
+            builder.Services.AddValidatorsFromAssemblyContaining<RefreshTokenValidator>();
+
 
             var app = builder.Build();
 

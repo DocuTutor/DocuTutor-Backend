@@ -6,6 +6,7 @@ namespace DocuTutor.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+
     public class DocumentController : ControllerBase
     {
         private readonly IDocStorageService _docStorageService;
