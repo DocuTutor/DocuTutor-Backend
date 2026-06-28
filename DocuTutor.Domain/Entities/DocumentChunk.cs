@@ -10,7 +10,6 @@ namespace DocuTutor.Domain.Entities
         public string ChunkText { get; set; } = string.Empty;
         public float[]? Embedding { get; set; }
 
-        // Navigation property
         public Document Document { get; set; } = null!;
     }
 }

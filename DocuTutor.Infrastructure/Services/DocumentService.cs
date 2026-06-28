@@ -36,7 +36,6 @@ namespace DocuTutor.Infrastructure.Repositories
         public async Task<Document?> GetDocumentByIdAsync(Guid documentId)
         {
             return await _context.Documents
-                .Include(d => d.Chunks)
                 .FirstOrDefaultAsync(d => d.Id == documentId);
         }
 
