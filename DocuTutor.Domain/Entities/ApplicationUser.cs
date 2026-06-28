@@ -19,6 +19,16 @@ namespace DocuTutor.Domain.Entities
         public DateTime UpdatedAt { get; private set; }
         public virtual ICollection<RefreshToken>? RefreshTokens { get; set; } = new List<RefreshToken>();
 
-    
+        public ApplicationUser(string userName, string email, string? fullName = null)
+        {
+            UserName = userName;
+            Email = email;
+            FullName = fullName;
+            IsActive = true;
+            CreatedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+
     }
 }
