@@ -1,29 +1,34 @@
-﻿using DocuTutor.Application.Response;
+﻿using DocuTutor.Application.DTOs.Auth.ForgetPassword;
+using DocuTutor.Application.DTOs.Auth.Login;
+using DocuTutor.Application.DTOs.Auth.RefreshToken;
+using DocuTutor.Application.DTOs.Auth.Register;
+using DocuTutor.Application.DTOs.Auth.ResetPassword;
+using DocuTutor.Application.Interfaces.Auth;
+using DocuTutor.Application.Response;
 using DocuTutor.Domain.Entities;
+using DocuTutor.Infrastructure.ExternalInterfaces.IEmailInterface;
 using DocuTutor.Infrastructure.ExternalInterfaces.IJwtTokenService;
+using DocuTutor.Infrastructure.ExternalServices.EmailService;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using FluentValidation;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using DocuTutor.Application.DTOs.Auth.Register;
-using DocuTutor.Application.DTOs.Auth.RefreshToken;
-using Microsoft.EntityFrameworkCore;
-using DocuTutor.Application.Interfaces.Auth;
-using DocuTutor.Application.DTOs.Auth.Login;
 
 namespace DocuTutor.Infrastructure.Services.AuthService
 {
-    public class AuthService(UserManager<ApplicationUser> userManager, IValidator<RegisterRequestDto> validator, IValidator<RefreshTokenRequestDto> refreshTokenValidator, IJwtTokenService _jwtService, IConfiguration config, IServiceScopeFactory serviceScopeFactory) : IAuthService
+    public class AuthService(UserManager<ApplicationUser> userManager, IValidator<RegisterRequestDto> validator, IValidator<RefreshTokenRequestDto> refreshTokenValidator, 
+                            IJwtTokenService _jwtService, IConfiguration config, IServiceScopeFactory serviceScopeFactory, IEmailSender _emailSender) : IAuthService
     {
         public async Task<Response<string>> RegisterAsync(RegisterRequestDto request)
         {
             try
             {
-                //Validation Handeled Here only For Now due To Problem In Auto Validation.
 
                 var validation = await validator.ValidateAsync(request);
 
@@ -95,7 +100,6 @@ namespace DocuTutor.Infrastructure.Services.AuthService
 
             try
             {
-                //Validation Handeled Here only For Now due To Problem In Auto Validation.
                 var validation = await refreshTokenValidator.ValidateAsync(request);
 
                 if (!validation.IsValid)
@@ -242,8 +246,57 @@ namespace DocuTutor.Infrastructure.Services.AuthService
                     200);
         }
 
+        public async Task<Response<string>> ForgotPasswordAsync(ForgotPasswordDto forgotPassword)
+        {
+            try
+            {
+                var user = await userManager.FindByEmailAsync(forgotPassword.Email!);
 
+                if (user is null)
+                    return Response<string>.Failure("", "Invalid User", 400);
 
+                var token = await userManager.GeneratePasswordResetTokenAsync(user);
+                var param = new Dictionary<string, string?>
+                    {
+                         {"token", token},
+                         {"email", forgotPassword.Email!}
+                    };
+
+                var callback = QueryHelpers.AddQueryString(forgotPassword.ClientUri!, param);
+                var message = new EmailMessage([user.Email], "Reset Password", callback);
+
+                ////for tsting only
+                //Console.WriteLine($"Decoded Token: {token}");
+                /////////
+
+                await _emailSender.SendEmailAsync(message);
+                return Response<string>.Success("Done", "Reset password link has been sent to your email", 200);
+            }
+            catch (OperationCanceledException)
+            {
+                return Response<string>.Failure("", $"Request was cancelled.", 499, []);
+            }
+            catch (Exception)
+            {
+                return Response<string>.Failure("", $"An unexpected error occurred.", 500, []);
+            }
+        }
+
+        public async Task<Response<string>> ResetPasswordAsync(ResetPasswordDto resetPassword)
+        {
+            var user = await userManager.FindByEmailAsync(resetPassword.Email!);
+            if (user is null)
+                return Response<string>.Failure("", "Invalid Request", 400);
+
+            var result = await userManager.ResetPasswordAsync(user, resetPassword.Token!, resetPassword.Password!);
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description);
+                return Response<string>.Failure("", "Failed to reset password", 400, errors.ToList());
+            }
+
+            return Response<string>.Success("Done", "Password reset successfully", 200);
+        }
 
 
     }

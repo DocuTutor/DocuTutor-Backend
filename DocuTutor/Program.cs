@@ -1,5 +1,8 @@
 
 using DocuTutor.Application.DTOs.Auth.Register;
+using DocuTutor.Domain.Entities;
+using DocuTutor.Infrastructure.ExternalInterfaces.IEmailInterface;
+using DocuTutor.Infrastructure.ExternalServices.EmailService;
 using DocuTutor.Infrastructure.ServiceRegistration;
 using DocuTutor.Validarors.Auth;
 using FluentValidation;
@@ -7,7 +10,7 @@ namespace DocuTutor
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +28,7 @@ namespace DocuTutor
 
 
             var app = builder.Build();
+    
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
