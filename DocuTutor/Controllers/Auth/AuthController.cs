@@ -1,13 +1,18 @@
-﻿using DocuTutor.Application.DTOs.Auth.Login;
+﻿using DocuTutor.Application.DTOs.Auth.ForgetPassword;
+using DocuTutor.Application.DTOs.Auth.Login;
 using DocuTutor.Application.DTOs.Auth.RefreshToken;
 using DocuTutor.Application.DTOs.Auth.Register;
+using DocuTutor.Application.DTOs.Auth.ResetPassword;
 using DocuTutor.Application.Interfaces.Auth;
 using DocuTutor.Application.Response;
+using DocuTutor.Domain.Entities;
 using DocuTutor.Infrastructure.Services.AuthService;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using System.Security.Claims;
 using static System.Net.WebRequestMethods;
 
@@ -92,6 +97,51 @@ namespace DocuTutor.Presentation.Controllers.Auth
             {
                 return StatusCode(500,Response<LogInResponseDTO>.Failure(new LogInResponseDTO(),"An unexpected error occurred. Please try again later.",500,[ex.Message]));
             }
+        }
+
+        [HttpPost("forgotpassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPassword)
+        {
+            if (!ModelState.IsValid)
+            {
+                var validationErrors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                return BadRequest(
+                    Response<string>.Failure(
+                        "",
+                        "Validation failed",
+                        400,
+                        validationErrors));
+            }
+            var result = await authService.ForgotPasswordAsync(forgotPassword);
+            return StatusCode(result.StatusCode, result);
+
+
+        }
+
+        [HttpPost("resetpassword")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPassword)
+        {
+            if (!ModelState.IsValid)
+            {
+                var validationErrors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                return BadRequest(
+                    Response<string>.Failure(
+                        "",
+                        "Validation failed",
+                        400,
+                        validationErrors));
+            }
+
+            var result = await authService.ResetPasswordAsync(resetPassword);
+            return StatusCode(result.StatusCode, result);
         }
 
 
