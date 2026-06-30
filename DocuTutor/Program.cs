@@ -28,7 +28,7 @@ namespace DocuTutor
 
 
             var app = builder.Build();
-    
+            app.UseCors("AllowAngularApp");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

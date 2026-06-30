@@ -122,6 +122,17 @@ namespace DocuTutor.Infrastructure.ServiceRegistration
                 };
             });
 
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngularApp", policy =>
+                {
+                    policy
+                        .WithOrigins("http://localhost:4200") // Angular dev server
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+
 
 
 
