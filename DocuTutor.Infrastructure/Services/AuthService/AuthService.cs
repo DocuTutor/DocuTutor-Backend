@@ -45,7 +45,7 @@ namespace DocuTutor.Infrastructure.Services.AuthService
                     return Response<string>.Failure("",
                         "Email already exists",
                         400,
-                        ["A user with this email is already registered."]
+                        ["This Email already exists"]
                     );
                 }
                 var user = new ApplicationUser(request.Email, request.Email, request.FullName);
@@ -71,7 +71,7 @@ namespace DocuTutor.Infrastructure.Services.AuthService
 
                 user.RefreshTokens.Add(new RefreshToken
                 {
-                    Token = newRefreshToken,
+                    Token = newRefreshToken, 
                     CreatedOn = DateTime.UtcNow,
                     ExpiresOn = DateTime.UtcNow.AddDays(refreshTokenDays)
                 });
@@ -242,7 +242,7 @@ namespace DocuTutor.Infrastructure.Services.AuthService
                         IsAuthenticated = true,
                         RefreshToken = newRefreshToken
                     },
-                    "Login successful",
+                    "Logged in successfully",
                     200);
         }
 

@@ -102,20 +102,20 @@ namespace DocuTutor.Presentation.Controllers.Auth
         [HttpPost("forgotpassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPassword)
         {
-            if (!ModelState.IsValid)
-            {
-                var validationErrors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToList();
+            //if (!ModelState.IsValid)
+            //{
+            //    var validationErrors = ModelState.Values
+            //        .SelectMany(v => v.Errors)
+            //        .Select(e => e.ErrorMessage)
+            //        .ToList();
 
-                return BadRequest(
-                    Response<string>.Failure(
-                        "",
-                        "Validation failed",
-                        400,
-                        validationErrors));
-            }
+            //    return BadRequest(
+            //        Response<string>.Failure(
+            //            "",
+            //            "Validation failed",
+            //            400,
+            //            validationErrors));
+            //}
             var result = await authService.ForgotPasswordAsync(forgotPassword);
             return StatusCode(result.StatusCode, result);
 
@@ -125,20 +125,20 @@ namespace DocuTutor.Presentation.Controllers.Auth
         [HttpPost("resetpassword")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPassword)
         {
-            if (!ModelState.IsValid)
-            {
-                var validationErrors = ModelState.Values
-                    .SelectMany(v => v.Errors)
-                    .Select(e => e.ErrorMessage)
-                    .ToList();
+            //if (!ModelState.IsValid)
+            //{
+            //    var validationErrors = ModelState.Values
+            //        .SelectMany(v => v.Errors)
+            //        .Select(e => e.ErrorMessage)
+            //        .ToList();
 
-                return BadRequest(
-                    Response<string>.Failure(
-                        "",
-                        "Validation failed",
-                        400,
-                        validationErrors));
-            }
+            //    return BadRequest(
+            //        Response<string>.Failure(
+            //            "",
+            //            "Validation failed",
+            //            400,
+            //            validationErrors));
+            //}
 
             var result = await authService.ResetPasswordAsync(resetPassword);
             return StatusCode(result.StatusCode, result);
