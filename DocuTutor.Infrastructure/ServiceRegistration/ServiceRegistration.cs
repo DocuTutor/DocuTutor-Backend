@@ -2,6 +2,7 @@
 using DocuTutor.Application.DTOs;
 using DocuTutor.Application.Interfaces;
 using DocuTutor.Application.Interfaces.Auth;
+using DocuTutor.Application.Interfaces.Payments;
 using DocuTutor.Application.Response;
 using DocuTutor.Domain.Entities;
 using DocuTutor.Infrastructure.Data.Context;
@@ -9,9 +10,11 @@ using DocuTutor.Infrastructure.ExternalInterfaces.IEmailInterface;
 using DocuTutor.Infrastructure.ExternalInterfaces.IJwtTokenService;
 using DocuTutor.Infrastructure.ExternalServices;
 using DocuTutor.Infrastructure.ExternalServices.EmailService;
+using DocuTutor.Infrastructure.ExternalServices.Payments;
 using DocuTutor.Infrastructure.Repositories;
 using DocuTutor.Infrastructure.Services.AuthService;
 using DocuTutor.Infrastructure.Services.JWTService;
+using DocuTutor.Infrastructure.Services.SubscriptionService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -99,6 +102,11 @@ namespace DocuTutor.Infrastructure.ServiceRegistration
             });
             services.AddScoped<IRetrievalService, LangflowRetrievalService>();
             services.AddScoped<IAuthService, AuthService>();
+
+            // Stripe / Subscription Services Registration
+            services.Configure<StripeSettings>(configuration.GetSection("Stripe"));
+            services.AddScoped<IStripeService, StripeService>();
+            services.AddScoped<ISubscriptionService, DocuTutor.Infrastructure.Services.SubscriptionService.SubscriptionService>();
 
 
             //Global Validation response configuration
