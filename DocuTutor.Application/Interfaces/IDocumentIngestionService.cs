@@ -5,6 +5,6 @@ namespace DocuTutor.Application.Interfaces
         /// <summary>
         /// Triggers asynchronous document ingestion: downloads PDF, extracts text, sends to Langflow
         /// </summary>
-        Task TriggerIngestionAsync(string cloudinaryUrl, Guid documentId);
+        Task TriggerIngestionAsync(string cloudinaryUrl, Guid documentId, string userId);
     }
 }

@@ -7,6 +7,7 @@ namespace DocuTutor.Application.Interfaces
         Task<AnswerResultDto> AnswerAsync(
             Guid documentId,
             string question,
+            string? userId = null,
             CancellationToken cancellationToken = default);
     }
 }

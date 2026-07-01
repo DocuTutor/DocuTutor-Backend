@@ -1,11 +1,14 @@
 ﻿using DocuTutor.Application.DTOs;
 using DocuTutor.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace DocuTutor.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
 
     public class DocumentController : ControllerBase
     {
@@ -30,6 +33,10 @@ namespace DocuTutor.Controllers
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> UploadDocument(IFormFile file)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized(new { message = "User is not authenticated" });
+
             if (file == null)
                 return BadRequest(new { message = "File is required" });
 
@@ -44,10 +51,10 @@ namespace DocuTutor.Controllers
                 var document = await _documentService.CreateDocumentAsync(
                     fileName: file.FileName,
                     cloudinaryUrl: cloudinaryResult.Url,
-                    userId: null
+                    userId: userId
                 );
 
-                _ = _ingestionService.TriggerIngestionAsync(cloudinaryResult.Url, document.Id);
+                _ = _ingestionService.TriggerIngestionAsync(cloudinaryResult.Url, document.Id, userId);
 
                 return Ok(new DocumentUploadResponseDto
                 {
@@ -75,7 +82,11 @@ namespace DocuTutor.Controllers
         {
             try
             {
-                var document = await _documentService.GetDocumentByIdAsync(documentId);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (string.IsNullOrWhiteSpace(userId))
+                    return Unauthorized(new { message = "User is not authenticated" });
+
+                var document = await _documentService.GetDocumentByIdAsync(documentId, userId);
                 if (document == null)
                     return NotFound(new { message = "Document not found" });
 

@@ -27,19 +27,22 @@ namespace DocuTutor.Infrastructure.ExternalServices
             _logger = logger;
         }
 
-        public async Task TriggerIngestionAsync(string cloudinaryUrl, Guid documentId)
+        public async Task TriggerIngestionAsync(string cloudinaryUrl, Guid documentId, string userId)
         {
             try
             {
-                var baseUrl = _configuration["Langflow:BaseUrl"];
-                var flowId = _configuration["Langflow:IngestionFlowId"];
-                var apiKey = _configuration["Langflow:ApiKey"];
+                var baseUrl = _configuration["Langflow:BaseUrl"]
+                    ?? throw new InvalidOperationException("Langflow:BaseUrl is not configured.");
+                var flowId = _configuration["Langflow:IngestionFlowId"]
+                    ?? throw new InvalidOperationException("Langflow:IngestionFlowId is not configured.");
+                var apiKey = _configuration["Langflow:ApiKey"]
+                    ?? throw new InvalidOperationException("Langflow:ApiKey is not configured.");
+                var textInputNodeId = _configuration["Langflow:IngestionTextInputNodeId"] ?? "TextInput-nIOtJ";
+                var metadataNodeId = _configuration["Langflow:IngestionMetadataNodeId"] ?? "CustomComponent-viZPZ";
 
-                // 1. Download PDF from Cloudinary
                 var httpClient = _httpClientFactory.CreateClient();
                 var pdfBytes = await httpClient.GetByteArrayAsync(cloudinaryUrl);
 
-                // 2. Extract text using PdfPig
                 var extractedText = ExtractTextFromPdf(pdfBytes);
                 _logger.LogInformation("Extracted {Length} characters from PDF", extractedText.Length);
 
@@ -52,15 +55,18 @@ namespace DocuTutor.Infrastructure.ExternalServices
                     return;
                 }
 
-                // 3. Send extracted text to Langflow
                 var payload = new
                 {
                     input_type = "text",
                     output_type = "text",
                     tweaks = new Dictionary<string, object>
                     {
-                        ["TextInput-nIOtJ"] = new { input_value = extractedText },
-                        ["CustomComponent-viZPZ"] = new { document_id = documentId.ToString() }
+                        [textInputNodeId] = new { input_value = extractedText },
+                        [metadataNodeId] = new
+                        {
+                            document_id = documentId.ToString(),
+                            user_id = userId
+                        }
                     }
                 };
 
@@ -81,12 +87,17 @@ namespace DocuTutor.Infrastructure.ExternalServices
 
                 if (response.IsSuccessStatusCode)
                 {
-                    await langflowDocService.UpdateDocumentStatusAsync(documentId, "Ready");
+                    await langflowDocService.UpdateDocumentStatusAsync(documentId, "Ready", userId);
                     _logger.LogInformation("Document {DocumentId} ingestion completed", documentId);
                 }
                 else
                 {
-                    await langflowDocService.UpdateDocumentStatusAsync(documentId, "Error");
+                    _logger.LogError(
+                        "Langflow ingestion failed for document {DocumentId} using text node {TextNodeId} and metadata node {MetadataNodeId}",
+                        documentId,
+                        textInputNodeId,
+                        metadataNodeId);
+                    await langflowDocService.UpdateDocumentStatusAsync(documentId, "Error", userId);
                 }
             }
             catch (Exception ex)
@@ -96,7 +107,7 @@ namespace DocuTutor.Infrastructure.ExternalServices
                 {
                     using var errorScope = _serviceScopeFactory.CreateScope();
                     var errorDocService = errorScope.ServiceProvider.GetRequiredService<IDocumentService>();
-                    await errorDocService.UpdateDocumentStatusAsync(documentId, "Error");
+                    await errorDocService.UpdateDocumentStatusAsync(documentId, "Error", userId);
                 }
                 catch (Exception dbEx)
                 {

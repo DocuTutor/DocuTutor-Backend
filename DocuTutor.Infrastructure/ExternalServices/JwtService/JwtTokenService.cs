@@ -17,6 +17,7 @@ namespace DocuTutor.Infrastructure.Services.JWTService
             var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, user.Id),
+            new(ClaimTypes.NameIdentifier, user.Id),
             new(JwtRegisteredClaimNames.Email, user.Email!),
         };
 

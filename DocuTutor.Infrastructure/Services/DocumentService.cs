@@ -16,7 +16,7 @@ namespace DocuTutor.Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<Document> CreateDocumentAsync(string fileName, string cloudinaryUrl, Guid? userId = null)
+        public async Task<Document> CreateDocumentAsync(string fileName, string cloudinaryUrl, string userId)
         {
             var document = new Document
             {
@@ -33,15 +33,25 @@ namespace DocuTutor.Infrastructure.Repositories
             return document;
         }
 
-        public async Task<Document?> GetDocumentByIdAsync(Guid documentId)
+        public async Task<Document?> GetDocumentByIdAsync(Guid documentId, string? userId = null)
         {
-            return await _context.Documents
-                .FirstOrDefaultAsync(d => d.Id == documentId);
+            var query = _context.Documents.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(userId))
+            {
+                query = query.Where(d => d.Id == documentId && d.UserId == userId);
+            }
+            else
+            {
+                query = query.Where(d => d.Id == documentId);
+            }
+
+            return await query.FirstOrDefaultAsync();
         }
 
-        public async Task UpdateDocumentStatusAsync(Guid documentId, string status)
+        public async Task UpdateDocumentStatusAsync(Guid documentId, string status, string? userId = null)
         {
-            var document = await _context.Documents.FindAsync(documentId);
+            var document = await GetDocumentByIdAsync(documentId, userId);
             if (document != null)
             {
                 document.Status = status;

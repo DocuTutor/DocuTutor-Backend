@@ -48,6 +48,12 @@ namespace DocuTutor.Infrastructure.Data.Context
                 entity.Property(e => e.CloudinaryUrl).IsRequired().HasMaxLength(1000);
                 entity.Property(e => e.Status).IsRequired().HasMaxLength(20).HasDefaultValue("processing");
                 entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+                entity.Property(e => e.UserId).IsRequired().HasMaxLength(450);
+
+                entity.HasOne<ApplicationUser>()
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
                 
                 // Relationships
                 entity.HasMany(e => e.Chunks)

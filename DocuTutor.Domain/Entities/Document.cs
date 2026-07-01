@@ -5,7 +5,7 @@ namespace DocuTutor.Domain.Entities
     public class Document
     {
         public Guid Id { get; set; }
-        public Guid? UserId { get; set; }
+        public string UserId { get; set; } = string.Empty;
         public string FileName { get; set; } = string.Empty;
         public string CloudinaryUrl { get; set; } = string.Empty;
         public string Status { get; set; } = "processing"; // processing, ready, error

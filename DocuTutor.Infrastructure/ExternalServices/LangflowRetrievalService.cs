@@ -35,12 +35,13 @@ namespace DocuTutor.Infrastructure.ExternalServices
         public async Task<AnswerResultDto> AnswerAsync(
             Guid documentId,
             string question,
+            string? userId = null,
             CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(question))
                 throw new LangflowRetrievalException("Question cannot be empty.");
 
-            var document = await _documentService.GetDocumentByIdAsync(documentId);
+            var document = await _documentService.GetDocumentByIdAsync(documentId, userId);
             if (document is null)
                 throw new DocumentNotFoundException(documentId);
 
@@ -71,6 +72,7 @@ namespace DocuTutor.Infrastructure.ExternalServices
                     [retrieverNodeId] = new
                     {
                         document_id = documentId.ToString(),
+                        user_id = userId,
                         search_query = question
                     }
                 }
