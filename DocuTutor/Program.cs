@@ -6,6 +6,7 @@ using DocuTutor.Infrastructure.ExternalServices.EmailService;
 using DocuTutor.Infrastructure.ServiceRegistration;
 using DocuTutor.Validarors.Auth;
 using FluentValidation;
+using System.Text.Json.Serialization;
 namespace DocuTutor
 {
     public class Program
@@ -15,7 +16,11 @@ namespace DocuTutor
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
             builder.Services.AddOpenApi();
             builder.Services.AddSwaggerGen();
 

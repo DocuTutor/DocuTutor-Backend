@@ -16,6 +16,7 @@ namespace DocuTutor.Infrastructure.Data.Context
 
         public DbSet<Document> Documents { get; set; } = null!;
         public DbSet<DocumentChunk> DocumentChunks { get; set; } = null!;
+        public DbSet<Subscription> Subscriptions { get; set; } = null!;
 
         //Adding them when we implement the conversation and message features to avoid conflict
         //public DbSet<Conversation> Conversations => Set<Conversation>();
@@ -80,6 +81,20 @@ namespace DocuTutor.Infrastructure.Data.Context
                 
                 // Create index for document_id
                 entity.HasIndex(e => e.DocumentId);
+            });
+
+            // Subscription configuration
+            modelBuilder.Entity<Subscription>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => e.UserId).IsUnique();
+                entity.HasIndex(e => e.StripeSubscriptionId);
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
             });
         }
     }
